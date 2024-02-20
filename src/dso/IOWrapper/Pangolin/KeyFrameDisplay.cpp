@@ -84,7 +84,7 @@ void KeyFrameDisplay::setFromF(FrameShell* frame, CalibHessian* HCalib)
 	needRefresh=true;
 }
 
-void KeyFrameDisplay::setFromPose(const Sophus::SE3& pose, CalibHessian *HCalib)
+void KeyFrameDisplay::setFromPose(const SE3& pose, CalibHessian *HCalib)
 {
 	id = 0;
 	fx = HCalib->fxl();

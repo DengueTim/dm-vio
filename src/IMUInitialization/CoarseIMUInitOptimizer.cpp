@@ -32,7 +32,10 @@
 
 using namespace dmvio;
 using namespace gtsam;
-using symbol_shorthand::P, symbol_shorthand::S, symbol_shorthand::V, symbol_shorthand::B;
+using symbol_shorthand::P;
+using symbol_shorthand::S;
+using symbol_shorthand::V;
+using symbol_shorthand::B;
 
 dmvio::CoarseIMUInitOptimizer::CoarseIMUInitOptimizer(std::shared_ptr<PoseTransformation> transformDSOToIMU,
                                                       const IMUCalibration& imuCalibration,
@@ -47,7 +50,7 @@ dmvio::CoarseIMUInitOptimizer::CoarseIMUInitOptimizer(std::shared_ptr<PoseTransf
     params.lambdaLowerBound = settings.lambdaLowerBound;
 }
 
-void CoarseIMUInitOptimizer::handleFirstFrame(int frameId)
+void dmvio::CoarseIMUInitOptimizer::handleFirstFrame(int frameId)
 {
     // Note: the owner of this class is responsible for adding initial values and priors for the variables optimized
     // by transformDSOToIMU (e.g S0, G0).
@@ -64,7 +67,7 @@ void CoarseIMUInitOptimizer::handleFirstFrame(int frameId)
     values.insert(biasKey, imuBias::ConstantBias(gtsam::Vector6::Zero()));
 }
 
-void dmvio::CoarseIMUInitOptimizer::addPose(int frameId, const Sophus::SE3d& camToWorld,
+void dmvio::CoarseIMUInitOptimizer::addPose(int frameId, const SE3& camToWorld,
                                             const gtsam::PreintegratedImuMeasurements* imuData)
 {
     // Note that we are optimizing worldToCam!
@@ -176,7 +179,7 @@ dmvio::CoarseIMUInitOptimizer::OptimizationResult dmvio::CoarseIMUInitOptimizer:
                     {
                         const auto* shell = activeShells.at(sym.index());
                         // compute updated camToWorld
-                        Sophus::SE3d camToWorld = shell->camToWorld;
+                        SE3 camToWorld = shell->camToWorld;
                         if(shell->keyframeId == -1)
                         {
                             camToWorld = shell->trackingRef->camToWorld * shell->camToTrackingRef;

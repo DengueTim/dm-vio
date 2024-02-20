@@ -747,8 +747,8 @@ bool CoarseTracker::trackNewestCoarse(
 
 	bool trackingGood = true;
 
-	if((setting_affineOptModeA != 0 && (fabsf(aff_g2l_out.a) > 1.2))
-	|| (setting_affineOptModeB != 0 && (fabsf(aff_g2l_out.b) > 200)))
+	if((setting_affineOptModeA != 0 && (abs(aff_g2l_out.a) > 1.2))
+	|| (setting_affineOptModeB != 0 && (abs(aff_g2l_out.b) > 200)))
 		trackingGood = false;
 
 	Vec2f relAff = AffLight::fromToVecExposure(lastRef->ab_exposure, newFrame->ab_exposure, lastRef_aff_g2l, aff_g2l_out).cast<float>();

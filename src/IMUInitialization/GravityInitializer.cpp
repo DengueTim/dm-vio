@@ -32,8 +32,8 @@ GravityInitializer::GravityInitializer(int numMeasurementsToUse, const IMUCalibr
     gravity = imuCalibration.gravity;
 }
 
-Sophus::SE3d
-GravityInitializer::addMeasure(const IMUData& imuData, const Sophus::SE3d& currToFirst)
+dmvio::SE3
+GravityInitializer::addMeasure(const IMUData& imuData, const SE3& currToFirst)
 {
     int numMeasure = 0;
     Eigen::Vector3d measure(0.0, 0.0, 0.0);
@@ -64,12 +64,12 @@ GravityInitializer::addMeasure(const IMUData& imuData, const Sophus::SE3d& currT
     Eigen::Quaterniond quat;
     quat.setFromTwoVectors(measure, -gravity);
 
-    Sophus::SE3d imuToWorld(quat, Eigen::Vector3d::Zero());
+    SE3 imuToWorld(quat, Eigen::Vector3d::Zero());
 
     return imuToWorld;
 }
 
-double dmvio::getGravityError(const Sophus::SE3d& imuToWorld, const Sophus::SE3d& imuToWorldGT)
+double dmvio::getGravityError(const SE3& imuToWorld, const SE3& imuToWorldGT)
 {
     Eigen::Vector3d g = (gtsam::Vector(3)
             << 0, 0, -9.8082).finished(); // Only the direction actually matters so it's ok if this is not the actually used gravity.

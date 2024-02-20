@@ -40,7 +40,9 @@
 
 
 using namespace dmvio;
-using dso::VecX, dso::MatXX, dso::EFFrame;
+using dso::VecX;
+using dso::MatXX;
+using dso::EFFrame;
 using std::vector;
 using gtsam::Symbol;
 
@@ -234,9 +236,9 @@ BAGTSAMIntegration::computeBAUpdate(const dso::MatXX& inputH, const VecX& inputB
         // In practice this is usually the identity transformation.
         dso::Mat44 worldToCam = transformationDSOToBA->transformPoseInverse(
                 newBAValues->at<gtsam::Pose3>(poseKey).matrix());
-        Sophus::SE3d newVal(worldToCam);
+        SE3 newVal(worldToCam);
 
-        Sophus::SE3d oldVal = h->data->PRE_worldToCam;
+        SE3 oldVal = h->data->PRE_worldToCam;
 
         // Note that there might be a more efficient way to compute the increment using adjoints!
         // newVal = exp(inc) * oldVal -> inc = log(newVal * oldVal^{-1})
@@ -340,7 +342,7 @@ void BAGTSAMIntegration::computeEvaluationPointValues(const std::vector<dso::EFF
     for(dso::EFFrame* h : frames)
     {
         dso::Vec10 stateZero = h->data->get_state_zero();
-        Sophus::SE3d evalPoint = h->data->get_worldToCam_evalPT();
+        SE3 evalPoint = h->data->get_worldToCam_evalPT();
         gtsam::Pose3 pose(evalPoint.matrix());
         assert(stateZero.segment(0, 6).norm() == 0);
         gtsam::Vector2 affine = stateZero.segment(6, 2);
@@ -405,7 +407,7 @@ void BAGTSAMIntegration::addFirstBAFrame(int keyframeId)
 }
 
 void
-BAGTSAMIntegration::addKeyframeToBA(int keyframeId, const Sophus::SE3d& keyframePose, vector<dso::EFFrame*>& frames)
+BAGTSAMIntegration::addKeyframeToBA(int keyframeId, const SE3& keyframePose, vector<dso::EFFrame*>& frames)
 {
     dmvio::TimeMeasurement timeMeasurement("addKeyframeToBA");
 

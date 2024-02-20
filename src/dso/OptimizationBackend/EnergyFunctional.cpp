@@ -851,24 +851,11 @@ void EnergyFunctional::solveSystemF(int iteration, double lambda, CalibHessian* 
     VecX  bL_top, bA_top, bM_top, b_sc;
 
     accumulateAF_MT(HA_top, bA_top,multiThreading);
-
-
     accumulateLF_MT(HL_top, bL_top,multiThreading);
-
-
-
     accumulateSCF_MT(H_sc, b_sc,multiThreading);
-
-
 
     bM_top = (bM+ HM * getStitchedDeltaF());
     VecX bMGTSAM_top = (bMForGTSAM + HMForGTSAM * getStitchedDeltaF());
-
-
-
-
-
-
 
     MatXX HFinal_top;
     VecX bFinal_top;
@@ -879,12 +866,8 @@ void EnergyFunctional::solveSystemF(int iteration, double lambda, CalibHessian* 
         bool haveFirstFrame = false;
         for(EFFrame* f : frames) if(f->frameID==0) haveFirstFrame=true;
 
-
-
-
         MatXX HT_act =  HL_top + HA_top - H_sc;
         VecX bT_act =   bL_top + bA_top - b_sc;
-
 
         if(!haveFirstFrame)
             orthogonalize(&bT_act, &HT_act);
@@ -892,20 +875,13 @@ void EnergyFunctional::solveSystemF(int iteration, double lambda, CalibHessian* 
         HFinal_top = HT_act + HM;
         bFinal_top = bT_act + bM_top;
 
-
-
-
-
         lastHS = HFinal_top;
         lastbS = bFinal_top;
 
         for(int i=0;i<8*nFrames+CPARS;i++) HFinal_top(i,i) *= (1+lambda);
-
     }
     else
     {
-
-
         HFinal_top = HL_top + HM + HA_top;
         bFinal_top = bL_top + bM_top + bA_top - b_sc;
 
@@ -915,11 +891,6 @@ void EnergyFunctional::solveSystemF(int iteration, double lambda, CalibHessian* 
         for(int i=0;i<8*nFrames+CPARS;i++) HFinal_top(i,i) *= (1+lambda);
         HFinal_top -= H_sc * (1.0f/(1+lambda));
     }
-
-
-
-
-
 
     VecX x;
     if(setting_solverMode & SOLVER_SVD)
@@ -950,7 +921,6 @@ void EnergyFunctional::solveSystemF(int iteration, double lambda, CalibHessian* 
             else Ub[i] /= S[i];
         }
         x = SVecI.asDiagonal() * svd.matrixV() * Ub;
-
     }
     else
     {

@@ -43,7 +43,8 @@
 
 using namespace dmvio;
 using gtsam::Symbol;
-using gtsam::symbol_shorthand::S, gtsam::symbol_shorthand::G;
+using gtsam::symbol_shorthand::S;
+using gtsam::symbol_shorthand::G;
 
 constexpr char end = '\n';
 // Version for flushing always (slower, but useful for crashes).
@@ -194,6 +195,8 @@ void dmvio::BAIMULogic::addFirstBAFrame(int keyframeId, BAGraphs* baGraphs, gtsa
     baValues->insert(vel_current_key, initialVelocity);
     baValues->insert(bias_current_key, initialBias);
 
+	assert(baGraphs == std::addressof(baIntegration->getBaGraphs()));
+
     if(imuSettings.setting_prior_bias)
     {
         gtsam::noiseModel::Diagonal::shared_ptr bias_prior_model = gtsam::noiseModel::Diagonal::Variances(
@@ -233,7 +236,7 @@ void dmvio::BAIMULogic::setNextBAVel(const gtsam::Vector3& velocity, int frameId
 }
 
 void dmvio::BAIMULogic::addKeyframe(BAGraphs* baGraphs, gtsam::Values::shared_ptr baValues, int keyframeId,
-                                    const Sophus::SE3& keyframePose, std::vector<dso::EFFrame*>& frames)
+                                    const SE3& keyframePose, std::vector<dso::EFFrame*>& frames)
 {
     if(disableFromKF > 0 && keyframeId > disableFromKF)
     {
@@ -289,6 +292,7 @@ void dmvio::BAIMULogic::addKeyframe(BAGraphs* baGraphs, gtsam::Values::shared_pt
         auto transformedFactor = boost::make_shared<PoseTransformationFactor>(imuFactor,
                                                                               *transformDSOToIMU,
                                                                               PoseTransformationFactor::JACOBIAN_FACTOR);
+		assert(baGraphs == std::addressof(baIntegration->getBaGraphs()));
         baGraphs->addFactor(transformedFactor, METRIC_GROUP);
 
         gtsam::noiseModel::Diagonal::shared_ptr biasNoiseModel = computeBiasNoiseModel(imuCalibration, imuMeasurements);

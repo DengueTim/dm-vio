@@ -81,7 +81,7 @@ public:
     void setScale(double variable);
     double getScale() const;
 
-    const Sophus::SE3d& getT_cam_imu() const;
+    const SE3& getT_cam_imu() const;
     void resetGravityDirection();
 
     std::unique_ptr<PoseTransformation> clone() const override;
@@ -111,7 +111,7 @@ private:
     // Note that we represent rotation this way (not with the inverse) because we have a right-sided increment,
     // and this way we can fix the z axis of this rotation.
 
-    Sophus::SE3d T_cam_imu;
+    SE3 T_cam_imu;
 
     bool precomputedValid{false};
     Sophus::Sim3d precomputed;
@@ -158,7 +158,7 @@ public:
     std::unique_ptr<PoseTransformation> clone() const override;
 private:
     std::shared_ptr<T> transformToIMU;
-    Sophus::SE3d referenceToWorld;
+    SE3 referenceToWorld;
     int keyframeId = -1;
 
     friend gtsam::Matrix66 dmvio::getCoarsePoseDerivative<>(const PoseTransformation::PoseType& pose,

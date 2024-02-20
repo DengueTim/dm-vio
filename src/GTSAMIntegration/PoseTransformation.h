@@ -133,33 +133,6 @@ public:
     virtual gtsam::Matrix66 getPoseDerivative(const PoseType& pose, DerivativeDirection direction) override;
 };
 
-// Create the inverse of a PoseTransformation.
-template<typename T> class InversePoseTransform : public PoseTransformation
-{
-public:
-    explicit InversePoseTransform(T& originalTransform)
-            : transform(originalTransform)
-    {}
-
-    PoseType transformPose(const PoseType& pose) const override
-    {
-        return transform.transformPoseInverse(pose);
-    }
-
-    PoseType transformPoseInverse(const PoseType& pose) const override
-    {
-        return transform.transformPose(pose);
-    }
-
-    std::unique_ptr<PoseTransformation> clone() const override
-    {
-        return std::unique_ptr<PoseTransformation>(new InversePoseTransform<T>(*this));
-    }
-
-private:
-    T& transform;
-};
-
 // Convert Hessian (and gradient vector b) from DSO Bundle Adjustment to GTSAM. Also uses the poseTransformation (typically just identity) to transform the poses.
 // ordering and keyDimMap are used to identify which column / row of the Hessian corresponds to which variable.
 std::pair<gtsam::Matrix, gtsam::Vector> convertHAndBFromDSO(const dso::MatXX& H, const dso::VecX& b,
@@ -241,7 +214,7 @@ template<typename T> inline void assertNumericJac(const gtsam::Matrix& numericJa
 // Note that this method modifies the passed variableToChange (which can be an internal member of the PoseTransformation in some cases),
 // so this method is typically very far from thread-safe!
 template<typename T> gtsam::Matrix
-computeNumericJacobian(PoseTransformation& transformation, const Sophus::SE3d& pose, T* variableToChange,
+computeNumericJacobian(PoseTransformation& transformation, const SE3& pose, T* variableToChange,
                        DerivativeDirection direction)
 {
 #ifndef DEBUG
@@ -254,7 +227,7 @@ computeNumericJacobian(PoseTransformation& transformation, const Sophus::SE3d& p
     // Numeric Jacobians work by slightly changing the pose in each direction, and then computing how much it effects the
     // converted pose.
     dso::Mat44 transformedPose = transformation.transformPose(pose.matrix());
-    Sophus::SE3d transformedPoseInv = Sophus::SE3d(transformedPose).inverse();
+    SE3 transformedPoseInv = SE3(transformedPose).inverse();
     for(int i = 0; i < T::DoF; ++i)
     {
         gtsam::Vector incVec = gtsam::Vector::Zero(T::DoF);
@@ -270,9 +243,9 @@ computeNumericJacobian(PoseTransformation& transformation, const Sophus::SE3d& p
             *variableToChange = T::exp(incVec) * *variableToChange;
         }
 
-        Sophus::SE3d transformedPoseNew(transformation.transformPose(pose.matrix()));
+        SE3 transformedPoseNew(transformation.transformPose(pose.matrix()));
         *variableToChange = variableBackup;
-        Sophus::SE3d relPose;
+        SE3 relPose;
         if(direction == dmvio::DerivativeDirection::LEFT_TO_LEFT ||
            direction == dmvio::DerivativeDirection::RIGHT_TO_LEFT)
         {
@@ -282,7 +255,7 @@ computeNumericJacobian(PoseTransformation& transformation, const Sophus::SE3d& p
             relPose = transformedPoseInv * transformedPoseNew;
         }
 
-        dso::Vec6 derivative = Sophus::SE3d::log(relPose);
+        dso::Vec6 derivative = SE3::log(relPose);
         fullDerivative.col(i) = derivative / epsilon;
     }
 

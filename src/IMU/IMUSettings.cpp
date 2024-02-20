@@ -51,7 +51,7 @@ void IMUCalibration::initDefault()
             -0.0257744366974, 0.00375618835797, 0.999660727178;
     p << -0.0216401454975, -0.064676986768, 0.00981073058949;
 
-    Sophus::SE3d imu_cam(m, p);
+    SE3 imu_cam(m, p);
     T_cam_imu = imu_cam.inverse();
 }
 
@@ -83,7 +83,7 @@ void IMUCalibration::loadFromFile(std::string settingsFilename)
         }
     }
     std::cout << "Used T_cam_imu: " << std::endl << matrix << std::endl;
-    T_cam_imu = Sophus::SE3d(matrix);
+    T_cam_imu = SE3(matrix);
 
     if(config["accelerometer_random_walk"] || config["gyroscope_random_walk"] || config["accelerometer_noise_density"]  ||
     config["gyroscope_noise_density"])
@@ -115,7 +115,7 @@ void IMUCalibration::saveToFile(std::string filename)
     stream << node;
 }
 
-IMUCalibration::IMUCalibration(const Sophus::SE3d& tCamImu) : T_cam_imu(tCamImu)
+IMUCalibration::IMUCalibration(const SE3& tCamImu) : T_cam_imu(tCamImu)
 {}
 
 void IMUSettings::registerArgs(dmvio::SettingsUtil& set)

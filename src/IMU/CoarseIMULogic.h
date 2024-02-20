@@ -49,12 +49,12 @@ public:
                    IMUSettings& imuSettings);
 
     // (Re-)initialize the coarse tracking graph after a new reference frame has been activated.
-    Sophus::SE3d initCoarseGraph(int keyframeId, std::unique_ptr<InformationBAToCoarse> informationBAToCoarse);
+    SE3 initCoarseGraph(int keyframeId, std::unique_ptr<InformationBAToCoarse> informationBAToCoarse);
 
     // Adds an new frame with IMU data to the coarse factor graph, marginalizes old variables, and returns an estimate
     // for the relative pose of the newly added frame.
     // dontMargFrame is the id of a frame (usually a prepared KF) which should not be marginalized.
-    Sophus::SE3d addIMUData(const IMUData& imuData,
+    SE3 addIMUData(const IMUData& imuData,
                             int frameId, double frameTimestamp,
                             int lastFrameId,
                             boost::shared_ptr<gtsam::PreintegratedImuMeasurements> additionalMeasurements = nullptr,
@@ -64,7 +64,7 @@ public:
     // Called by CoarseTracker (at the moment they are forwarded through IMUIntegration):
 
     // Passes the new coarse pose.
-    void updateCoarsePose(const Sophus::SE3d& pose);
+    void updateCoarsePose(const SE3& pose);
 
     // This method integrates the CoarseTracker optimization with GTSAM. It is called in each iteration, and
     // will compute the increment for the optimization iteration.
@@ -72,7 +72,7 @@ public:
     // increment of the affine lightning transforms after the method call, incNorm is the norm of the increment.
     // b contains the following parameters: 3 for the rotation ref_to_frame, 3 for the translation ref_to_frame, and
     // 2 for affine lightning parameters.
-    Sophus::SE3d computeCoarseUpdate(const dso::Mat88& H, const dso::Vec8& b, float extrapFac, float lambda,
+    SE3 computeCoarseUpdate(const dso::Mat88& H, const dso::Vec8& b, float extrapFac, float lambda,
                                      double& incA, double& incB, double& incNorm);
 
     // Apply the update computed by the last call of computeCoarseUpdate.
@@ -82,7 +82,7 @@ public:
     void addVisualToCoarseGraph(const dso::Mat88& H, const dso::Vec8& b, bool trackingIsGood);
 
 
-    Sophus::SE3d getCoarseKFPose();
+    SE3 getCoarseKFPose();
     gtsam::imuBias::ConstantBias getBias(int frameId);
     gtsam::Vector3 getVelocity(int frameId);
     void printCoarseBiases(const dmvio::GTData* gtData, int frameId);

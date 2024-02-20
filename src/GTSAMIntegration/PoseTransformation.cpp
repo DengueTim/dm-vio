@@ -28,14 +28,15 @@
 
 using namespace dmvio;
 using dso::Vec8;
-using gtsam::Matrix, gtsam::Vector;
+using gtsam::Matrix;
+using gtsam::Vector;
 using gtsam::Symbol;
 
 // Default implementation for child classes uses numeric Jacobians and should work out of the box.
 gtsam::Matrix66 PoseTransformation::getPoseDerivative(const PoseType& posePassed, DerivativeDirection direction)
 {
     // copy, because it needs to be changed by computeNumericJacobian.
-    Sophus::SE3d pose(posePassed);
+    SE3 pose(posePassed);
     return computeNumericJacobian(*this, pose, &pose, direction);
 }
 
@@ -60,7 +61,7 @@ gtsam::Matrix66 TransformIdentity::getPoseDerivative(const PoseType& pose, Deriv
         gtsam::Matrix66 returning = gtsam::Pose3(pose).AdjointMap();
 #ifdef DEBUG
         // Check numeric jacobian.
-        Sophus::SE3d poseForNum(pose);
+        SE3 poseForNum(pose);
         gtsam::Matrix numJac = computeNumericJacobian(*this, poseForNum, &poseForNum, direction);
         assertNumericJac(numJac, returning);
 #endif

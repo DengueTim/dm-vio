@@ -31,7 +31,7 @@
 
 dmvio::CoarseIMULogic::CoarseIMULogic(std::unique_ptr<PoseTransformation> transformBAToIMU,
                                       boost::shared_ptr<gtsam::PreintegrationParams> preintegrationParams,
-                                      const IMUCalibration& imuCalibration, dmvio::IMUSettings& imuSettings)
+                                      const IMUCalibration& imuCalibration, IMUSettings& imuSettings)
         : transformBAToIMU(std::move(transformBAToIMU)),
           preintegrationParams(preintegrationParams),
           imuSettings(imuSettings),
@@ -41,7 +41,7 @@ dmvio::CoarseIMULogic::CoarseIMULogic(std::unique_ptr<PoseTransformation> transf
 }
 
 
-Sophus::SE3d dmvio::CoarseIMULogic::addIMUData(const dmvio::IMUData& imuData, int frameId, double frameTimestamp,
+dmvio::SE3 dmvio::CoarseIMULogic::addIMUData(const dmvio::IMUData& imuData, int frameId, double frameTimestamp,
                                                int lastFrameId,
                                                boost::shared_ptr<gtsam::PreintegratedImuMeasurements> additionalMeasurements,
                                                int dontMargFrame)
@@ -181,7 +181,7 @@ Sophus::SE3d dmvio::CoarseIMULogic::addIMUData(const dmvio::IMUData& imuData, in
 
     transformIMUToDSOForCoarse->updateWithValues(*coarseValues);
     // Convert T_w_f to T_f_r:
-    Sophus::SE3d referenceToFrame(
+    SE3 referenceToFrame(
             transformIMUToDSOForCoarse->transformPose(coarseValues->at<gtsam::Pose3>(poseCurrentKey).matrix()));
 
     currentPoseKey = poseCurrentKey;
@@ -208,7 +208,7 @@ Sophus::SE3d dmvio::CoarseIMULogic::addIMUData(const dmvio::IMUData& imuData, in
     return referenceToFrame;
 }
 
-Sophus::SE3d
+dmvio::SE3
 dmvio::CoarseIMULogic::initCoarseGraph(int keyframeId, std::unique_ptr<InformationBAToCoarse> informationBAToCoarse)
 {
     currentKeyframeId = keyframeId;
@@ -288,10 +288,10 @@ dmvio::CoarseIMULogic::initCoarseGraph(int keyframeId, std::unique_ptr<Informati
     {
         lastKFToCurr = informationBAToCoarse->latestBAPose.inverse() * informationBAToCoarse->latestBAPosePrevKeyframe;
     }
-    return Sophus::SE3d(lastKFToCurr.matrix());
+    return SE3(lastKFToCurr.matrix());
 }
 
-Sophus::SE3d
+dmvio::SE3
 dmvio::CoarseIMULogic::computeCoarseUpdate(const dso::Mat88& H_in, const dso::Vec8& b_in, float extrapFac, float lambda,
                                            double& incA, double& incB, double& incNorm)
 {
@@ -359,19 +359,19 @@ dmvio::CoarseIMULogic::computeCoarseUpdate(const dso::Mat88& H_in, const dso::Ve
 
     incNorm = inc.norm();
     transformIMUToCoarse.updateWithValues(*newCoarseValues); // Set reference pose.
-    Sophus::SE3d newReferenceToFrame(
+    SE3 newReferenceToFrame(
             transformIMUToCoarse.transformPose(newCoarseValues->at<gtsam::Pose3>(currentPoseKey).matrix()));
 
     return newReferenceToFrame;
 
 }
 
-Sophus::SE3d dmvio::CoarseIMULogic::getCoarseKFPose()
+dmvio::SE3 dmvio::CoarseIMULogic::getCoarseKFPose()
 {
-    return Sophus::SE3d(coarseValues->at<gtsam::Pose3>(gtsam::Symbol('p', currentKeyframeId)).matrix());
+    return SE3(coarseValues->at<gtsam::Pose3>(gtsam::Symbol('p', currentKeyframeId)).matrix());
 }
 
-void dmvio::CoarseIMULogic::updateCoarsePose(const Sophus::SE3& refToFrame)
+void dmvio::CoarseIMULogic::updateCoarsePose(const SE3& refToFrame)
 {
     // GTSAM expects currentImu to world, we passed referenceCamera to currentCamera.
     PoseTransformation& transformIMUToCoarse = *transformIMUToDSOForCoarse;

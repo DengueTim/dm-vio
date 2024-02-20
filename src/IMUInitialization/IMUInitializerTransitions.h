@@ -53,10 +53,10 @@ public:
 
     virtual IMUInitializerState::unique_ptr
     marginalizationReplacementReady(std::unique_ptr<gtsam::Values>&& optimizedValues)
-    {};
+	{ return 0; };
 
     virtual IMUInitializerState::unique_ptr marginalizationReplaced()
-    {};
+    { return 0; };
 };
 
 // Enumeration for the available transition models.

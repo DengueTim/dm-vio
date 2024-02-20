@@ -57,6 +57,7 @@
 namespace dmvio
 {
 
+using dso::SE3;
 
 // Main class for the integration of IMU data into DSO. Mostly a facade as the implementation logic is forwarded to
 // either CoarseIMULogic (for the coarse tracking), BAIMULogic (for the integration of IMU into the main bundle
@@ -78,12 +79,12 @@ public:
 
     // called when the coarse tracking reference is switched.
     // Returns transformation from last keyframe to new keyframe.
-    Sophus::SE3d initCoarseGraph();
+    SE3 initCoarseGraph();
 
     // Called to add IMU data for the coarse tracking (and the IMU initializer).
     // Adds a new frame with IMU data to the coarse factor graph, marginalizes old variables, and returns an estimate
     // for the relative pose of the newly added frame.
-    Sophus::SE3 addIMUData(const IMUData& imuData,
+    SE3 addIMUData(const IMUData& imuData,
                            int frameId, double frameTimestamp, bool firstFrameAfterKFChange,
                            int lastFrameId, bool onlyForHint = false);
 
@@ -95,7 +96,7 @@ public:
     void resetBAPreintegration();
 
     // Passes the new coarse tracking pose.
-    void updateCoarsePose(const Sophus::SE3& pose);
+    void updateCoarsePose(const SE3& pose);
 
     // This method integrates the CoarseTracker optimization with GTSAM. It is called in each iteration, and
     // will compute the increment for the optimization iteration.
@@ -103,7 +104,7 @@ public:
     // increment of the affine lightning transforms after the method call, incNorm is the norm of the increment.
     // b contains the following parameters: 3 for the rotation ref_to_frame, 3 for the translation ref_to_frame, and
     // 2 for affine lightning parameters.
-    Sophus::SE3 computeCoarseUpdate(const dso::Mat88& H, const dso::Vec8& b, float extrapFac, float lambda,
+    SE3 computeCoarseUpdate(const dso::Mat88& H, const dso::Vec8& b, float extrapFac, float lambda,
                                     double& incA, double& incB, double& incNorm);
 
     // Apply the update computed by the last call of computeCoarseUpdate.
@@ -112,7 +113,7 @@ public:
     void addVisualToCoarseGraph(const dso::Mat88& H, const dso::Vec8& b, bool trackingIsGood);
 
     // Returns the pose of the current keyframe as computed by the coarse tracking as a gtsam Pose (imu to world)
-    Sophus::SE3d getCoarseKFPose();
+    SE3 getCoarseKFPose();
 
     // Called when DSO finishes coarse tracking.
     void finishCoarseTracking(const dso::FrameShell& frameShell, bool willBecomeKeyframe);
@@ -147,7 +148,7 @@ public:
     // thread marginalization and post BA stuff -> finishKeyframeOperations()
     void finishKeyframeOperations(int keyframeId);
 
-    Sophus::SE3 TS_cam_imu;
+    SE3 TS_cam_imu;
 
     // Sets groundtruth data for a frame for printing out information. Should only be used in non-rt mode as it currently
     // does not handle multiple threads correctly.

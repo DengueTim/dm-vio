@@ -83,7 +83,7 @@ public:
     virtual void publishCamPose(FrameShell* frame, CalibHessian* HCalib) override;
     virtual void publishSystemStatus(dmvio::SystemStatus systemStatus) override;
 
-    void addGTCamPose(const Sophus::SE3& gtPose);
+    void addGTCamPose(const SE3& gtPose);
 
     virtual void pushLiveFrame(FrameHessian* image) override;
     virtual void pushDepthImage(MinimalImageB3* image) override;

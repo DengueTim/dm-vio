@@ -104,7 +104,7 @@ TEST_P(SimpleGraphTestsWithParams, WithTransformDSOToIMUNew)
     PoseTransformationFactor::ConversionType conversionType = GetParam();
     std::shared_ptr<TransformDSOToIMU> transform(
             new TransformDSOToIMU(gtsam::Pose3::identity(), std::make_shared<bool>(true),
-                                  std::make_shared<bool>(false), std::make_shared<bool>(false), true, 0));
+                                  std::make_shared<bool>(false), std::make_shared<bool>(false), true));
 
     graph.push_back(boost::make_shared<PoseTransformationFactor>(between01, *transform, conversionType));
     graph.push_back(boost::make_shared<PoseTransformationFactor>(between12, *transform, conversionType));

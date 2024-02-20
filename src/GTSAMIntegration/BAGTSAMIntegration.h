@@ -60,7 +60,7 @@ public:
     // Called when a keyframe (except the first one) is added.
     // The method is supposed to add its factors to baGraphs, and new variables into baValues.
     virtual void addKeyframe(BAGraphs* baGraphs, gtsam::Values::shared_ptr baValues, int keyframeId,
-                             const Sophus::SE3d& keyframePose, std::vector<dso::EFFrame*>& frames) = 0;
+                             const SE3& keyframePose, std::vector<dso::EFFrame*>& frames) = 0;
 
     // The extension can update the passed ordering with more variables.
     virtual void
@@ -130,7 +130,7 @@ public:
 // pose types), and on making the keyframe marginalization works (which is taken over by GTSAM now).
 // This way the GTSAM integration can be decoupled from the Bundle-Adjustment code of DSO, mathematically the result
 // is equal to a joint optimization of all variables, as long as no GTSAM factor depends on the point depths.
-class BAGTSAMIntegration
+class  BAGTSAMIntegration
 {
 public:
     // Will take ownership of passed unique_ptrs.
@@ -153,8 +153,7 @@ public:
     void removeExtension(BAExtension* extension);
 
 
-    // Getters
-    // --------------------------------------------------
+		    // --------------------------------------------------
     double getCurrBaTimestamp() const;
 
     // There are both, baValues and baEvalValues. The former are the current values obtained during the optimization,
@@ -174,7 +173,7 @@ public:
 
     void addFirstBAFrame(int keyframeId);
 
-    void addKeyframeToBA(int keyframeId, const Sophus::SE3d& keyframePose, std::vector<dso::EFFrame*>& frames);
+    void addKeyframeToBA(int keyframeId, const SE3& keyframePose, std::vector<dso::EFFrame*>& frames);
 
     // called from addKeyframeToBA and from outside (FullSystem::makeKeyFrame)
     void updateBAOrdering(std::vector<dso::EFFrame*>& frames);

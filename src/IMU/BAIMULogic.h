@@ -82,7 +82,7 @@ public:
     virtual void addFirstBAFrame(int keyframeId, BAGraphs* baGraphs, gtsam::Values::shared_ptr baValues) override;
 
     virtual void addKeyframe(BAGraphs* baGraphs, gtsam::Values::shared_ptr baValues, int keyframeId,
-                             const Sophus::SE3d& keyframePose, std::vector<dso::EFFrame*>& frames) override;
+                             const SE3& keyframePose, std::vector<dso::EFFrame*>& frames) override;
 
     virtual void
     updateBAOrdering(std::vector<dso::EFFrame*>& frames, gtsam::Ordering* ordering, KeyDimMap& baDimMap) override;

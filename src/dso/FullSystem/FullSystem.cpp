@@ -269,20 +269,20 @@ void FullSystem::printResult(std::string file, bool onlyLogKFPoses, bool saveMet
 		if(onlyLogKFPoses && s->marginalizedAt == s->id) continue;
 
         // firstPose is transformFirstToWorld. We actually want camToFirst here ->
-        Sophus::SE3 camToWorld = s->camToWorld;
+        SE3 camToWorld = s->camToWorld;
 
         // Use camToTrackingReference for nonKFs and the updated camToWorld for KFs.
         if(useCamToTrackingRef && s->keyframeId == -1)
         {
             camToWorld = s->trackingRef->camToWorld * s->camToTrackingRef;
         }
-        Sophus::SE3 camToFirst = firstPose.inverse() * camToWorld;
+        SE3 camToFirst = firstPose.inverse() * camToWorld;
 
         if(saveMetricPoses)
         {
             // Transform pose to IMU frame.
             // not actually camToFirst any more...
-            camToFirst = Sophus::SE3d(imuIntegration.getTransformDSOToIMU().transformPose(camToWorld.inverse().matrix()));
+            camToFirst = SE3(imuIntegration.getTransformDSOToIMU().transformPose(camToWorld.inverse().matrix()));
         }
 
 		myfile << s->timestamp <<
@@ -297,7 +297,7 @@ void FullSystem::printResult(std::string file, bool onlyLogKFPoses, bool saveMet
 	myfile.close();
 }
 
-std::pair<Vec4, bool> FullSystem::trackNewCoarse(FrameHessian* fh, Sophus::SE3 *referenceToFrameHint)
+std::pair<Vec4, bool> FullSystem::trackNewCoarse(FrameHessian* fh, SE3 *referenceToFrameHint)
 {
     dmvio::TimeMeasurement timeMeasurement(referenceToFrameHint ? "FullSystem::trackNewCoarse" : "FullSystem::trackNewCoarseNoIMU");
 	assert(allFrameHistory.size() > 0);
@@ -920,7 +920,7 @@ void FullSystem::addActiveFrame(ImageAndExposure* image, int id, dmvio::IMUData*
 			coarseInitializer->setFirst(&Hcalib, fh);
             if(setting_useIMU)
             {
-                gravityInit.addMeasure(*imuData, Sophus::SE3d());
+                gravityInit.addMeasure(*imuData, SE3());
             }
             for(IOWrap::Output3DWrapper* ow : outputWrapper)
                 ow->publishSystemStatus(dmvio::VISUAL_INIT);
@@ -931,7 +931,7 @@ void FullSystem::addActiveFrame(ImageAndExposure* image, int id, dmvio::IMUData*
 			if(setting_useIMU)
 			{
                 imuIntegration.addIMUDataToBA(*imuData);
-				Sophus::SE3 imuToWorld = gravityInit.addMeasure(*imuData, Sophus::SE3d());
+				SE3 imuToWorld = gravityInit.addMeasure(*imuData, SE3());
 				if(initDone)
 				{
 					firstPose = imuToWorld * imuIntegration.TS_cam_imu.inverse();

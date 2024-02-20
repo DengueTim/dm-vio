@@ -51,7 +51,7 @@ dmvio::IMUInitializerLogic::IMUInitializerLogic(std::string resultsPrefix,
     }
 
     transformDSOToIMU.reset(new TransformDSOToIMU(gtsam::Pose3(imuCalibration.T_cam_imu.matrix()),
-                                                  optScale, optGravity, optT_cam_imu, true, 0));
+                                                  optScale, optGravity, optT_cam_imu, true));
 
     transformDSOToIMUAfterPGBA.reset(new TransformDSOToIMU(*transformDSOToIMU));
 

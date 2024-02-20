@@ -128,6 +128,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/thirdparty/sse2neon
   ${EIGEN3_INCLUDE_DIR}
   ${GTSAM_INCLUDE_DIR}
+#  /Users/tp/src/gtsam
 ) 
 
 
@@ -204,4 +205,6 @@ else()
 	message("--- not building dmvio_dataset, since either don't have openCV or Pangolin.")
 endif()
 
-add_subdirectory(test)
+#add_subdirectory(test)
+
+#include_directories("/Users/tp/src/gtsam")
